@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CraveNest – Food That Finds You</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --flame: #FF4500;
+    --ember: #FF8C42;
+    --cream: #FFF8F0;
+    --char: #1A1008;
+    --smoke: #3D2B1F;
+    --gold: #F5C518;
+    --leaf: #2D7D46;
+    --surface: #FFFFFF;
+    --muted: #8A7060;
+    --border: #EDE0D4;
+    --shadow: rgba(26,16,8,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--char);
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 999;
+    background: rgba(255,248,240,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 24px var(--shadow); }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 900;
+    color: var(--flame);
+    letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .logo span { color: var(--char); }
+
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+    font-size: .9rem; font-weight: 500;
+  }
+  .nav-links a {
+    color: var(--smoke); text-decoration: none;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--flame); }
+
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+  .btn-outline {
+    border: 1.5px solid var(--flame); color: var(--flame);
+    background: transparent; padding: 8px 18px;
+    border-radius: 50px; font-size: .85rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-outline:hover { background: var(--flame); color: #fff; }
+
+  .btn-primary {
+    background: var(--flame); color: #fff;
+    border: none; padding: 10px 22px;
+    border-radius: 50px; font-size: .85rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 14px rgba(255,69,0,.35);
+  }
+  .btn-primary:hover { background: #e03d00; transform: translateY(-1px); }
+
+  .cart-btn { display: none !important; /* hidden */ 
+    position: relative;
+    background: var(--char); color: #fff;
+    border: none; padding: 9px 18px 9px 14px;
+    border-radius: 50px; font-size: .85rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: background .2s;
+  }
+  .cart-btn:hover { background: var(--smoke); }
+  .cart-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--flame); color: #fff;
+    font-size: .65rem; font-weight: 700;
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: var(--char); border-radius: 2px; transition: all .3s; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 100px 5% 60px;
+    gap: 3rem;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; top: -120px; right: -120px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,140,66,.18) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: .7; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+
+  .hero-text { position: relative; z-index: 2; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,69,0,.1); border: 1px solid rgba(255,69,0,.25);
+    color: var(--flame); padding: 5px 14px;
+    border-radius: 50px; font-size: .78rem; font-weight: 600;
+    margin-bottom: 1.5rem;
+    animation: fadeUp .6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 5vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.2rem;
+    animation: fadeUp .7s ease .1s both;
+  }
+
+  .hero h1 em {
+    font-style: normal; color: var(--flame);
+    display: block;
+  }
+
+  .hero p {
+    font-size: 1.05rem; color: var(--muted);
+    line-height: 1.7; max-width: 480px;
+    margin-bottom: 2rem;
+    animation: fadeUp .7s ease .2s both;
+  }
+
+  .hero-search {
+    display: flex; gap: 0;
+    background: #fff;
+    border-radius: 60px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 8px 30px var(--shadow);
+    overflow: hidden;
+    max-width: 500px;
+    margin-bottom: 2rem;
+    animation: fadeUp .7s ease .3s both;
+  }
+
+  .hero-search input {
+    flex: 1; border: none; outline: none;
+    padding: 14px 20px;
+    font-size: .95rem; font-family: 'DM Sans', sans-serif;
+    background: transparent; color: var(--char);
+  }
+
+  .hero-search select {
+    border: none; border-left: 1.5px solid var(--border);
+    padding: 0 16px; background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem; color: var(--smoke);
+    cursor: pointer; outline: none;
+  }
+
+  .hero-search button {
+    background: var(--flame); color: #fff;
+    border: none; padding: 14px 24px;
+    font-weight: 600; font-size: .9rem;
+    cursor: pointer; transition: background .2s;
+    white-space: nowrap;
+  }
+  .hero-search button:hover { background: #e03d00; }
+
+  .hero-stats {
+    display: flex; gap: 2rem;
+    animation: fadeUp .7s ease .4s both;
+  }
+
+  .stat { display: flex; flex-direction: column; }
+  .stat strong {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--char);
+  }
+  .stat small { font-size: .78rem; color: var(--muted); }
+
+  /* Hero visual */
+  .hero-visual {
+    position: relative;
+    display: flex; justify-content: center; align-items: center;
+    animation: fadeUp .8s ease .2s both;
+  }
+
+  .hero-plate {
+    width: min(420px, 90vw); height: min(420px, 90vw);
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid #fff;
+    box-shadow: 0 20px 80px rgba(255,69,0,.25), 0 4px 20px var(--shadow);
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-plate img {
+    width: 100%; height: 100%; object-fit: cover;
+    animation: spinSlow 40s linear infinite;
+  }
+
+  @keyframes spinSlow {
+    from { transform: scale(1.08) rotate(0deg); }
+    to { transform: scale(1.08) rotate(360deg); }
+  }
+
+  .float-card {
+    position: absolute;
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 30px var(--shadow);
+    display: flex; align-items: center; gap: 10px;
+    font-size: .82rem; font-weight: 600;
+    z-index: 3;
+    animation: floatBounce 4s ease-in-out infinite;
+  }
+
+  .float-card.top-left { top: 10%; left: -5%; animation-delay: 0s; }
+  .float-card.bottom-right { bottom: 12%; right: -5%; animation-delay: 2s; }
+  .float-card.top-right { top: 20%; right: -8%; font-size: .75rem; animation-delay: 1s; }
+
+  @keyframes floatBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .fc-icon { font-size: 1.4rem; }
+  .fc-info { display: flex; flex-direction: column; }
+  .fc-info span { color: var(--muted); font-weight: 400; font-size: .72rem; }
+
+  /* ── CATEGORIES ── */
+  section { padding: 70px 5%; }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 2rem;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700;
+  }
+  .section-header a {
+    color: var(--flame); text-decoration: none;
+    font-size: .88rem; font-weight: 600;
+  }
+
+  .categories {
+    display: flex; gap: 1rem;
+    overflow-x: auto; padding-bottom: .5rem;
+    scrollbar-width: none;
+  }
+  .categories::-webkit-scrollbar { display: none; }
+
+  .cat-pill {
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    transition: all .2s;
+    min-width: 90px;
+  }
+  .cat-pill:hover, .cat-pill.active {
+    background: var(--flame); border-color: var(--flame);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255,69,0,.3);
+  }
+  .cat-pill:hover span, .cat-pill.active span { color: #fff; }
+  .cat-pill .emoji { font-size: 1.8rem; }
+  .cat-pill span { font-size: .75rem; font-weight: 600; color: var(--smoke); }
+
+  /* ── FOOD GRID ── */
+  .food-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .food-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all .25s;
+    cursor: pointer;
+    position: relative;
+  }
+  .food-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px var(--shadow);
+  }
+
+  .food-img {
+    width: 100%; height: 200px;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s;
+  }
+  .food-card:hover .food-img { transform: scale(1.04); }
+
+  .food-img-wrap { overflow: hidden; position: relative; }
+
+  .food-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--leaf); color: #fff;
+    font-size: .68rem; font-weight: 700;
+    padding: 3px 9px; border-radius: 50px;
+    letter-spacing: .5px; text-transform: uppercase;
+  }
+  .food-badge.hot { background: var(--flame); }
+  .food-badge.new { background: var(--gold); color: var(--char); }
+
+  .food-fav {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,.9);
+    border: none; border-radius: 50%;
+    width: 34px; height: 34px;
+    cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .food-fav:hover { transform: scale(1.15); }
+  .food-fav.liked { background: var(--flame); }
+
+  .food-body { padding: 1rem 1.1rem 1.2rem; }
+
+  .food-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: .4rem;
+  }
+
+  .food-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--char);
+  }
+
+  .food-rating {
+    display: flex; align-items: center; gap: 4px;
+    font-size: .78rem; font-weight: 600;
+    color: var(--char);
+  }
+  .food-rating .star { color: var(--gold); }
+
+  .food-desc {
+    font-size: .8rem; color: var(--muted);
+    line-height: 1.5; margin-bottom: .8rem;
+  }
+
+  .food-footer {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .food-price {
+    font-size: 1.15rem; font-weight: 700; color: var(--flame);
+  }
+  .food-price small { font-size: .75rem; color: var(--muted); font-weight: 400; }
+
+  .food-info { display: flex; gap: .8rem; font-size: .75rem; color: var(--muted); }
+
+  .add-btn {
+    background: var(--char); color: #fff;
+    border: none; border-radius: 50px;
+    padding: 8px 16px; font-size: .82rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .add-btn:hover { background: var(--flame); transform: scale(1.05); }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    background: var(--char);
+    color: #fff;
+    border-radius: 32px;
+    margin: 0 5%;
+    padding: 60px 5%;
+    position: relative; overflow: hidden;
+  }
+
+  .how-section::after {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,69,0,.2), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .how-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin-bottom: 3rem; text-align: center;
+  }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem; position: relative; z-index: 2;
+  }
+
+  .step { text-align: center; }
+
+  .step-icon {
+    font-size: 2.5rem; margin-bottom: 1rem;
+    display: block;
+    animation: bounce 3s ease-in-out infinite;
+  }
+  .step:nth-child(2) .step-icon { animation-delay: .5s; }
+  .step:nth-child(3) .step-icon { animation-delay: 1s; }
+  .step:nth-child(4) .step-icon { animation-delay: 1.5s; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--flame); color: #fff;
+    font-size: .7rem; font-weight: 700;
+    margin-bottom: .5rem;
+  }
+
+  .step h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+  .step p { font-size: .8rem; color: rgba(255,255,255,.6); line-height: 1.6; }
+
+  /* ── RESTAURANTS ── */
+  .rest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .rest-card {
+    border-radius: 20px; overflow: hidden;
+    position: relative; cursor: pointer;
+    height: 200px;
+  }
+
+  .rest-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .4s;
+    display: block;
+  }
+  .rest-card:hover img { transform: scale(1.06); }
+
+  .rest-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(26,16,8,.9) 0%, transparent 50%);
+    display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 1.2rem;
+  }
+
+  .rest-overlay h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: #fff; font-weight: 700;
+  }
+  .rest-meta { display: flex; gap: .8rem; margin-top: .3rem; }
+  .rest-tag {
+    font-size: .7rem; color: rgba(255,255,255,.75);
+    background: rgba(255,255,255,.15);
+    padding: 2px 8px; border-radius: 50px;
+  }
+  .rest-open {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--leaf); color: #fff;
+    font-size: .68rem; font-weight: 700;
+    padding: 3px 9px; border-radius: 50px;
+  }
+
+  /* ── OFFERS BANNER ── */
+  .offers-strip {
+    background: linear-gradient(135deg, var(--flame) 0%, var(--ember) 100%);
+    border-radius: 24px;
+    padding: 40px 5%;
+    margin: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1.5rem;
+    color: #fff;
+    position: relative; overflow: hidden;
+  }
+
+  .offers-strip::before {
+    content: '🍕';
+    position: absolute; right: 3%; top: -10px;
+    font-size: 6rem; opacity: .15;
+    animation: spin 20s linear infinite;
+  }
+
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .offer-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    margin-bottom: .4rem;
+  }
+  .offer-text p { font-size: .9rem; opacity: .85; }
+
+  .offer-code {
+    background: rgba(255,255,255,.2);
+    border: 1.5px dashed rgba(255,255,255,.6);
+    border-radius: 12px; padding: 12px 20px;
+    text-align: center;
+  }
+  .offer-code small { font-size: .72rem; opacity: .75; display: block; }
+  .offer-code strong { font-size: 1.5rem; letter-spacing: 2px; }
+
+  /* ── REVIEWS ── */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .review-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    transition: transform .2s;
+  }
+  .review-card:hover { transform: translateY(-4px); }
+
+  .reviewer { display: flex; align-items: center; gap: .8rem; margin-bottom: 1rem; }
+
+  .reviewer-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+    border: 2px solid var(--border);
+  }
+
+  .reviewer-info strong { font-size: .9rem; font-weight: 600; display: block; }
+  .reviewer-info small { font-size: .75rem; color: var(--muted); }
+
+  .review-stars { color: var(--gold); font-size: .9rem; margin-bottom: .6rem; }
+  .review-text { font-size: .85rem; color: var(--smoke); line-height: 1.6; }
+
+  /* ── APP DOWNLOAD ── */
+  .app-section {
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 32px;
+    margin: 0 5%;
+    padding: 60px 5%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center; gap: 3rem;
+  }
+
+  .app-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    margin-bottom: 1rem;
+  }
+  .app-text p { font-size: .95rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+
+  .app-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .app-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--char); color: #fff;
+    border-radius: 14px; padding: 12px 20px;
+    cursor: pointer; border: none; transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .app-btn:hover { background: var(--flame); transform: translateY(-2px); }
+  .app-btn .ab-icon { font-size: 1.5rem; }
+  .app-btn .ab-text { display: flex; flex-direction: column; text-align: left; }
+  .app-btn .ab-text small { font-size: .65rem; opacity: .7; }
+  .app-btn .ab-text strong { font-size: .88rem; }
+
+  .app-visual {
+    display: flex; justify-content: center;
+    font-size: 8rem;
+    animation: floatBounce 4s ease-in-out infinite;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--char); color: #fff;
+    padding: 50px 5% 25px;
+    margin-top: 70px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .footer-brand .logo { margin-bottom: 1rem; }
+  .footer-brand p { font-size: .85rem; color: rgba(255,255,255,.55); line-height: 1.7; }
+
+  .footer-col h4 {
+    font-size: .85rem; font-weight: 700;
+    margin-bottom: 1rem; color: rgba(255,255,255,.5);
+    text-transform: uppercase; letter-spacing: .8px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: .5rem; }
+  .footer-col ul li a {
+    font-size: .85rem; color: rgba(255,255,255,.65);
+    text-decoration: none; transition: color .2s;
+  }
+  .footer-col ul li a:hover { color: var(--flame); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: 1.2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: .5rem;
+    font-size: .8rem; color: rgba(255,255,255,.4);
+  }
+
+  .social-links { display: flex; gap: .7rem; }
+  .social-links a {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; text-decoration: none;
+    transition: background .2s;
+  }
+  .social-links a:hover { background: var(--flame); }
+
+  /* ── CART SIDEBAR ── */
+  .cart-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    z-index: 998; opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+  .cart-sidebar {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(380px, 100vw);
+    background: #fff; z-index: 999;
+    transform: translateX(100%); transition: transform .35s cubic-bezier(.25,.46,.45,.94);
+    display: flex; flex-direction: column;
+  }
+  .cart-sidebar.open { transform: translateX(0); }
+
+  .cart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .cart-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+  .cart-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; }
+
+  .cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+
+  .cart-item {
+    display: flex; gap: 1rem; align-items: center;
+    padding: .8rem 0; border-bottom: 1px solid var(--border);
+  }
+  .cart-item-img {
+    width: 56px; height: 56px; border-radius: 12px;
+    object-fit: cover; flex-shrink: 0;
+  }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: .88rem; font-weight: 600; }
+  .cart-item-price { font-size: .82rem; color: var(--flame); font-weight: 600; }
+
+  .qty-ctrl {
+    display: flex; align-items: center; gap: 8px;
+    font-size: .85rem; font-weight: 600;
+  }
+  .qty-btn {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--cream); border: 1px solid var(--border);
+    cursor: pointer; font-size: 1rem; display: flex;
+    align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .qty-btn:hover { background: var(--flame); color: #fff; }
+
+  .cart-footer {
+    padding: 1.2rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--cream);
+  }
+  .cart-total {
+    display: flex; justify-content: space-between;
+    font-size: 1rem; font-weight: 700; margin-bottom: 1rem;
+  }
+  .checkout-btn {
+    width: 100%; padding: 14px;
+    background: var(--flame); color: #fff;
+    border: none; border-radius: 14px;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: background .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .checkout-btn:hover { background: #e03d00; }
+
+  .empty-cart { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+  .empty-cart .ec-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--char); color: #fff;
+    padding: 12px 22px; border-radius: 50px;
+    font-size: .88rem; font-weight: 500;
+    z-index: 9999;
+    transition: transform .4s cubic-bezier(.25,.46,.45,.94);
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── MOBILE NAV ── */
+  .mobile-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 990;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    justify-content: space-around; padding: 8px 0 12px;
+  }
+  .mob-btn {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; font-size: .65rem; font-weight: 600;
+    color: var(--muted); cursor: pointer; border: none;
+    background: none;
+  }
+  .mob-btn .mbi { font-size: 1.4rem; }
+  .mob-btn.active { color: var(--flame); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; text-align: center; padding: 88px 4% 50px; }
+    .hero-visual { display: none; }
+    .hero-search { max-width: 100%; }
+    .hero-stats { justify-content: center; }
+    .hero p { max-width: 100%; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .app-section { grid-template-columns: 1fr; margin: 0 4%; padding: 40px 5%; }
+    .app-visual { font-size: 5rem; }
+    .nav-links, .btn-outline { display: none; }
+    .hamburger { display: flex; }
+    .mobile-nav { display: flex; }
+    body { padding-bottom: 70px; }
+    .how-section { margin: 0 4%; padding: 50px 5%; }
+    .offers-strip { margin: 0 4%; }
+  }
+
+  @media (max-width: 600px) {
+    body { overflow-x: hidden; }
+
+    nav { padding: 0 4%; }
+    .logo { font-size: 1.35rem; }
+    .btn-primary { padding: 8px 14px; font-size: .78rem; }
+
+    .hero { padding: 80px 4% 40px; }
+    .hero h1 { font-size: 2.2rem; }
+    .hero p { font-size: .9rem; }
+    .hero-badge { font-size: .72rem; }
+    .hero-stats { gap: 1.2rem; }
+    .stat strong { font-size: 1.3rem; }
+
+    .hero-search {
+      flex-direction: column;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .hero-search input { border-radius: 0; padding: 13px 16px; width: 100%; box-sizing: border-box; }
+    .hero-search select {
+      border-left: none;
+      border-top: 1.5px solid var(--border);
+      padding: 11px 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .hero-search button {
+      width: 100%;
+      border-radius: 0;
+      padding: 13px;
+    }
+
+    section { padding: 40px 4%; }
+    .section-header h2 { font-size: 1.35rem; }
+
+    .food-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .food-card { max-width: 100%; }
+
+    .rest-grid { grid-template-columns: 1fr; }
+
+    .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .offers-strip { margin: 0 4%; padding: 30px 5%; flex-direction: column; text-align: center; align-items: center; }
+    .how-section { margin: 0 4%; border-radius: 20px; padding: 40px 5%; }
+    .steps { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+    .reviews-grid { grid-template-columns: 1fr; }
+
+    .toast { font-size: .78rem; padding: 10px 16px; white-space: normal; text-align: center; max-width: 88vw; }
+
+    .cart-sidebar { width: 100vw; }
+
+    footer { padding: 40px 4% 20px; }
+    .footer-bottom { flex-direction: column; text-align: center; gap: .8rem; }
+  }
+
+  @media (max-width: 380px) {
+    .hero h1 { font-size: 1.9rem; }
+    .steps { grid-template-columns: 1fr; }
+    .hero-stats { flex-wrap: wrap; gap: 1rem; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="logo">Crave<span>Nest</span></div>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#restaurants">Restaurants</a></li>
+    <li><a href="#offers">Offers</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn-outline">Sign In</button>
+    <button class="btn-primary">Sign Up Free</button>
+    <button class="cart-btn" onclick="toggleCart()" style="display:none">
+      🛒 Cart
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+  <div class="hamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">🚀 30-min Guaranteed Delivery</div>
+    <h1>Food That<em>Finds You.</em></h1>
+    <p>Discover restaurants, bold flavors, and lightning-fast delivery across your city. From comfort classics to adventurous bites — CraveNest brings it all to your door.</p>
+
+    <div class="hero-search">
+      <input type="text" placeholder="Search dishes, restaurants…" />
+      <select>
+        <option>📍 Your City</option>
+        <option>Mumbai</option>
+        <option>Delhi</option>
+        <option>Bangalore</option>
+      </select>
+      <button onclick="showToast('🔍 Searching nearby restaurants…')">Search</button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat"><strong>4,200+</strong><small>Restaurants</small></div>
+      <div class="stat"><strong>180K+</strong><small>Happy Users</small></div>
+      <div class="stat"><strong>28 min</strong><small>Avg Delivery</small></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-plate">
+      <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80" alt="Delicious Pizza" />
+    </div>
+
+    <div class="float-card top-left">
+      <span class="fc-icon">⭐</span>
+      <div class="fc-info">
+        <strong>4.9 Rating</strong>
+        <span>12K+ reviews</span>
+      </div>
+    </div>
+
+    <div class="float-card bottom-right">
+      <span class="fc-icon">⚡</span>
+      <div class="fc-info">
+        <strong>Fast Delivery</strong>
+        <span>25 min avg</span>
+      </div>
+    </div>
+
+    <div class="float-card top-right">
+      <span class="fc-icon">🎉</span>
+      <div class="fc-info">
+        <strong>50% OFF</strong>
+        <span>First order</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section>
+  <div class="section-header">
+    <h2>What's Your Craving?</h2>
+    <a href="#">See all →</a>
+  </div>
+  <div class="categories">
+    <div class="cat-pill active" onclick="filterCategory(this)"><div class="emoji">🍽️</div><span>All</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🍕</div><span>Pizza</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🍔</div><span>Burgers</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🍣</div><span>Sushi</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🍜</div><span>Noodles</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🌮</div><span>Tacos</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🥗</div><span>Salads</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🍛</div><span>Curry</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🥩</div><span>Grill</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">🧁</div><span>Desserts</span></div>
+    <div class="cat-pill" onclick="filterCategory(this)"><div class="emoji">☕</div><span>Drinks</span></div>
+  </div>
+</section>
+
+<!-- MENU / FOOD GRID -->
+<section id="menu">
+  <div class="section-header">
+    <h2>🔥 Trending Near You</h2>
+    <a href="#">View all</a>
+  </div>
+  <div class="food-grid" id="foodGrid">
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=500&q=80" alt="Margherita Pizza" />
+        <span class="food-badge hot">🔥 Hot</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Margherita Pizza</span>
+          <span class="food-rating"><span class="star">★</span> 4.8</span>
+        </div>
+        <p class="food-desc">Classic wood-fired with San Marzano tomatoes, buffalo mozzarella & fresh basil.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹1,099 <small>/plate</small></div>
+            <div class="food-info"><span>🕐 20 min</span><span>🛵 Free</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Margherita Pizza', 1099, 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80" alt="Smash Burger" />
+        <span class="food-badge new">✨ New</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Double Smash Burger</span>
+          <span class="food-rating"><span class="star">★</span> 4.9</span>
+        </div>
+        <p class="food-desc">Two smashed beef patties, American cheese, caramelized onions & secret sauce.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹1,249 <small>/burger</small></div>
+            <div class="food-info"><span>🕐 15 min</span><span>🛵 ₹29</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Double Smash Burger', 1249, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500&q=80" alt="Salmon Sushi" />
+        <span class="food-badge">🌿 Healthy</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Salmon Sushi Roll</span>
+          <span class="food-rating"><span class="star">★</span> 4.7</span>
+        </div>
+        <p class="food-desc">Premium Atlantic salmon, cucumber, avocado, tobiko & wasabi mayo drizzle.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹1,549 <small>/8 pcs</small></div>
+            <div class="food-info"><span>🕐 25 min</span><span>🛵 Free</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Salmon Sushi Roll', 1549, 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80" alt="Butter Chicken" />
+        <span class="food-badge hot">🔥 Hot</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Butter Chicken</span>
+          <span class="food-rating"><span class="star">★</span> 4.9</span>
+        </div>
+        <p class="food-desc">Slow-simmered tandoori chicken in rich tomato-cream gravy with aromatic spices.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹1,349 <small>/bowl</small></div>
+            <div class="food-info"><span>🕐 30 min</span><span>🛵 Free</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Butter Chicken', 1349, 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=500&q=80" alt="Ramen" />
+        <span class="food-badge new">✨ New</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Tonkotsu Ramen</span>
+          <span class="food-rating"><span class="star">★</span> 4.6</span>
+        </div>
+        <p class="food-desc">Rich pork bone broth, chashu pork belly, marinated egg, bamboo shoots & nori.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹1,399 <small>/bowl</small></div>
+            <div class="food-info"><span>🕐 20 min</span><span>🛵 ₹19</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Tonkotsu Ramen', 1399, 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=500&q=80" alt="Chocolate Lava Cake" />
+        <span class="food-badge">🍫 Sweet</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Chocolate Lava Cake</span>
+          <span class="food-rating"><span class="star">★</span> 4.8</span>
+        </div>
+        <p class="food-desc">Warm dark chocolate cake with a gooey molten center, served with vanilla gelato.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹849 <small>/dessert</small></div>
+            <div class="food-info"><span>🕐 15 min</span><span>🛵 Free</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Chocolate Lava Cake', 849, 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80" alt="Caesar Salad" />
+        <span class="food-badge">🌿 Fresh</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Grilled Caesar Salad</span>
+          <span class="food-rating"><span class="star">★</span> 4.5</span>
+        </div>
+        <p class="food-desc">Charred romaine, homemade caesar dressing, parmesan crisp & anchovy fillets.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹979 <small>/bowl</small></div>
+            <div class="food-info"><span>🕐 12 min</span><span>🛵 ₹9</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Grilled Caesar Salad', 979, 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="food-card">
+      <div class="food-img-wrap">
+        <img class="food-img" src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500&q=80" alt="Tacos" />
+        <span class="food-badge hot">🔥 Spicy</span>
+        <button class="food-fav" onclick="toggleFav(this)">🤍</button>
+      </div>
+      <div class="food-body">
+        <div class="food-meta">
+          <span class="food-name">Street Tacos Al Pastor</span>
+          <span class="food-rating"><span class="star">★</span> 4.7</span>
+        </div>
+        <p class="food-desc">Marinated pork, pineapple salsa, pickled onion & cilantro in warm corn tortillas.</p>
+        <div class="food-footer">
+          <div>
+            <div class="food-price">₹1,199 <small>/3 tacos</small></div>
+            <div class="food-info"><span>🕐 18 min</span><span>🛵 Free</span></div>
+          </div>
+          <button class="add-btn" onclick="addToCart('Street Tacos Al Pastor', 1199, 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=100&q=60')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <h2>How CraveNest Works</h2>
+  <div class="steps">
+    <div class="step">
+      <span class="step-icon">📍</span>
+      <div class="step-num">1</div>
+      <h3>Set Your Location</h3>
+      <p>Tell us where you are and we'll show you the best restaurants in your area.</p>
+    </div>
+    <div class="step">
+      <span class="step-icon">🍽️</span>
+      <div class="step-num">2</div>
+      <h3>Choose Your Dish</h3>
+      <p>Browse thousands of dishes, filter by cuisine, rating, price, or delivery time.</p>
+    </div>
+    <div class="step">
+      <span class="step-icon">💳</span>
+      <div class="step-num">3</div>
+      <h3>Pay Securely</h3>
+      <p>Multiple payment options — cards, wallets, UPI. Safe, encrypted checkout.</p>
+    </div>
+    <div class="step">
+      <span class="step-icon">🛵</span>
+      <div class="step-num">4</div>
+      <h3>Enjoy Fast Delivery</h3>
+      <p>Track your order live. Our riders bring it hot to your doorstep in minutes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- RESTAURANTS -->
+<section id="restaurants">
+  <div class="section-header">
+    <h2>🏆 Top Restaurants</h2>
+    <a href="#">Explore all →</a>
+  </div>
+  <div class="rest-grid">
+
+    <div class="rest-card">
+      <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80" alt="Italian Restaurant" />
+      <span class="rest-open">Open</span>
+      <div class="rest-overlay">
+        <h3>La Bella Italia</h3>
+        <div class="rest-meta">
+          <span class="rest-tag">⭐ 4.9</span>
+          <span class="rest-tag">🍕 Italian</span>
+          <span class="rest-tag">25 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rest-card">
+      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Fine Dining" />
+      <span class="rest-open">Open</span>
+      <div class="rest-overlay">
+        <h3>The Ember House</h3>
+        <div class="rest-meta">
+          <span class="rest-tag">⭐ 4.8</span>
+          <span class="rest-tag">🥩 Grill</span>
+          <span class="rest-tag">35 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rest-card">
+      <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80" alt="Ramen Bar" />
+      <span class="rest-open">Open</span>
+      <div class="rest-overlay">
+        <h3>Nori Ramen Bar</h3>
+        <div class="rest-meta">
+          <span class="rest-tag">⭐ 4.7</span>
+          <span class="rest-tag">🍜 Japanese</span>
+          <span class="rest-tag">20 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rest-card">
+      <img src="https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=600&q=80" alt="Indian Restaurant" />
+      <span class="rest-open">Open</span>
+      <div class="rest-overlay">
+        <h3>Spice Route</h3>
+        <div class="rest-meta">
+          <span class="rest-tag">⭐ 4.9</span>
+          <span class="rest-tag">🍛 Indian</span>
+          <span class="rest-tag">30 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rest-card">
+      <img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&q=80" alt="Sushi Bar" />
+      <span class="rest-open">Open</span>
+      <div class="rest-overlay">
+        <h3>Sakura Sushi</h3>
+        <div class="rest-meta">
+          <span class="rest-tag">⭐ 4.8</span>
+          <span class="rest-tag">🍣 Sushi</span>
+          <span class="rest-tag">28 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rest-card">
+      <img src="https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&q=80" alt="Burger Joint" />
+      <span class="rest-open">Open</span>
+      <div class="rest-overlay">
+        <h3>Smash & Stack</h3>
+        <div class="rest-meta">
+          <span class="rest-tag">⭐ 4.7</span>
+          <span class="rest-tag">🍔 Burgers</span>
+          <span class="rest-tag">15 min</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- OFFERS STRIP -->
+<div class="offers-strip" id="offers">
+  <div class="offer-text">
+    <h2>🎉 50% Off Your First Order!</h2>
+    <p>Use code below at checkout. Valid for new users only. Min. order ₹999.</p>
+  </div>
+  <div class="offer-code">
+    <small>Your promo code</small>
+    <strong>CRAVE50</strong>
+  </div>
+  <button class="btn-primary" onclick="showToast('✅ Code CRAVE50 copied!')">Copy Code</button>
+</div>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="section-header">
+    <h2>💬 What People Say</h2>
+    <a href="#">All reviews →</a>
+  </div>
+  <div class="reviews-grid">
+
+    <div class="review-card">
+      <div class="reviewer">
+        <img class="reviewer-avatar" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=100&q=60" alt="Priya" />
+        <div class="reviewer-info">
+          <strong>Priya Sharma</strong>
+          <small>Mumbai · 48 orders</small>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"CraveNest is hands-down the best food app I've used. The delivery is always blazing fast and the food arrives piping hot. Love the variety!"</p>
+    </div>
+
+    <div class="review-card">
+      <div class="reviewer">
+        <img class="reviewer-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=60" alt="Marcus" />
+        <div class="reviewer-info">
+          <strong>Marcus Lee</strong>
+          <small>Delhi · 31 orders</small>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Ordered Butter Chicken for the first time here — absolutely mind-blowing. The live tracking is super accurate. Highly recommend!"</p>
+    </div>
+
+    <div class="review-card">
+      <div class="reviewer">
+        <img class="reviewer-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=60" alt="Ananya" />
+        <div class="reviewer-info">
+          <strong>Ananya Joshi</strong>
+          <small>Bangalore · 62 orders</small>
+        </div>
+      </div>
+      <div class="review-stars">★★★★☆</div>
+      <p class="review-text">"Great selection of restaurants and cuisines. The app is clean and easy to use. Customer support was quick when my order had an issue."</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- APP DOWNLOAD -->
+<div class="app-section">
+  <div class="app-text">
+    <h2>Get the CraveNest App 📱</h2>
+    <p>Order faster, track in real-time, unlock exclusive app-only deals, and manage your favorite restaurants all in one place. Available on iOS and Android.</p>
+    <div class="app-buttons">
+      <button class="app-btn" onclick="showToast('📱 Opening App Store…')">
+        <span class="ab-icon">🍎</span>
+        <div class="ab-text">
+          <small>Download on the</small>
+          <strong>App Store</strong>
+        </div>
+      </button>
+      <button class="app-btn" onclick="showToast('📱 Opening Play Store…')">
+        <span class="ab-icon">▶️</span>
+        <div class="ab-text">
+          <small>Get it on</small>
+          <strong>Google Play</strong>
+        </div>
+      </button>
+    </div>
+  </div>
+  <div class="app-visual">📱</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="margin-bottom:.8rem">Crave<span style="color:#fff">Nest</span></div>
+      <p>Delivering happiness, one plate at a time. CraveNest connects food lovers with the finest local restaurants.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>For You</h4>
+      <ul>
+        <li><a href="#">How It Works</a></li>
+        <li><a href="#">Offers & Promo</a></li>
+        <li><a href="#">CraveNest Pro</a></li>
+        <li><a href="#">Gift Cards</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">Help Centre</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Partner With Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="border-top: 1px solid rgba(255,255,255,.1); padding: 1.5rem 0 1rem; margin-bottom: .5rem; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; align-items: flex-start;">
+    <div>
+      <p style="font-size:.75rem; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.8px; margin-bottom:.5rem;">Contact</p>
+      <p style="font-size:.88rem; color:rgba(255,255,255,.8); font-weight:600;">Rahul Kumar</p>
+      <p style="font-size:.82rem; color:rgba(255,255,255,.55); margin-top:2px;">📍 Chandigarh, India</p>
+      <a href="mailto:rahulkgaming42@gmail.com" style="font-size:.82rem; color:var(--flame); text-decoration:none; margin-top:2px; display:block;">✉️ rahulkgaming42@gmail.com</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 CraveNest. All rights reserved. Designed & Developed by <strong style="color:rgba(255,255,255,.7)">Rahul Kumar</strong></span>
+    <div class="social-links">
+      <a href="#">🐦</a>
+      <a href="#">📘</a>
+      <a href="#">📸</a>
+      <a href="#">▶️</a>
+    </div>
+  </div>
+</footer>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3>🛒 Your Cart</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="empty-cart">
+      <div class="ec-icon">🍽️</div>
+      <p>Your cart is empty.<br>Add some delicious food!</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotal">₹0.00</span>
+    </div>
+    <button class="checkout-btn" onclick="showToast('🎉 Order placed! Delivery in ~28 min')">Place Order →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Done!</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <button class="mob-btn active"><span class="mbi">🏠</span>Home</button>
+  <button class="mob-btn" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})"><span class="mbi">🍽️</span>Menu</button>
+  <button class="mob-btn" onclick="toggleCart()"><span class="mbi">🛒</span>Cart</button>
+  <button class="mob-btn" onclick="showToast('👤 Sign in to view profile')"><span class="mbi">👤</span>Profile</button>
+</div>
+
+<script>
+  // ── NAV SCROLL ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── CART STATE ──
+  let cart = [];
+
+  function addToCart(name, price, img) {
+    const existing = cart.find(i => i.name === name);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ name, price, img, qty: 1 });
+    }
+    updateCart();
+    showToast(`🛒 ${name} added to cart!`);
+  }
+
+  function updateCart() {
+    const badge = document.getElementById('cartBadge');
+    const itemsEl = document.getElementById('cartItems');
+    const footer = document.getElementById('cartFooter');
+    const totalEl = document.getElementById('cartTotal');
+
+    const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+    badge.textContent = totalQty;
+
+    if (cart.length === 0) {
+      itemsEl.innerHTML = `<div class="empty-cart"><div class="ec-icon">🍽️</div><p>Your cart is empty.<br>Add some delicious food!</p></div>`;
+      footer.style.display = 'none';
+      return;
+    }
+
+    footer.style.display = 'block';
+    let html = '';
+    cart.forEach((item, idx) => {
+      html += `
+        <div class="cart-item">
+          <img class="cart-item-img" src="${item.img}" alt="${item.name}" />
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">₹${(item.price * item.qty).toFixed(0)}</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+          </div>
+        </div>`;
+    });
+    itemsEl.innerHTML = html;
+
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    totalEl.textContent = `₹${total.toFixed(0)}`;
+  }
+
+  function changeQty(idx, delta) {
+    cart[idx].qty += delta;
+    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    updateCart();
+  }
+
+  function toggleCart() {
+    document.getElementById('cartSidebar').classList.toggle('open');
+    document.getElementById('cartOverlay').classList.toggle('open');
+  }
+
+  // ── TOAST ──
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── CATEGORY FILTER ──
+  function filterCategory(el) {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    showToast(`🔍 Filtering by ${el.querySelector('span').textContent}…`);
+  }
+
+  // ── FAVOURITES ──
+  function toggleFav(btn) {
+    const liked = btn.classList.toggle('liked');
+    btn.textContent = liked ? '❤️' : '🤍';
+    showToast(liked ? '❤️ Added to favourites!' : '💔 Removed from favourites');
+  }
+
+  // ── MOBILE MENU ──
+  function toggleMobileMenu() {
+    showToast('📋 Menu coming soon!');
+  }
+</script>
+</body>
+</html>
